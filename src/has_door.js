@@ -13,6 +13,15 @@ module.exports = {
         Service = this.homebridge.hap.Service;
         Characteristic = this.homebridge.hap.Characteristic;
 
+        // flag that the accessory could offer a door service
+        this.schema.setHasDoor(true);
+
+        // does the user want to have a door service? If not, remove any existing door service
+        if (this.config.removeDoorService) {
+            this.accessory.removeService(this.accessory.getService(Service.Door));
+            return;
+        }
+
         // Create a Door service for the appliance door
         this.doorService = this.accessory.getService(Service.Door)
                         || this.accessory.addService(Service.Door, 'Door');

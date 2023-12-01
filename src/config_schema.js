@@ -110,6 +110,13 @@ export class ConfigSchema {
                 if (!program) return;
                 program.options = options;
                 this.writeSchema();
+            },
+
+            setHasDoor: hasDoor => {
+                let appliance = this.appliances[haId];
+                if (!appliance) return;
+                appliance.hasDoor = hasDoor;
+                this.writeSchema();
             }
         };
     }
@@ -495,6 +502,30 @@ export class ConfigSchema {
             form.push({
                 type:       'help',
                 helpvalue:  'This appliance does not support any programs.'
+            });
+        }
+
+        // If the appliance supports door service offer an option to remove this
+        // service from the accessory. By default HomeKit create notification to all
+        // user devices on any door opened or door closed event. So any user needs to
+        // disable notification for this accessory on any device to avoid getting
+        // notified. Thus, if the door service is not critical to the user he can
+        // simply supress the door service for the accessory.
+        if (appliance.hasDoor) {
+
+            // add a flag whether the door service should be removed from the accessory or not
+            schema.removeDoorService = {
+                type: 'boolean',
+                required: false,
+                default: false
+            };
+
+            // allow the user to toggle this flag from the UI
+            form.push({
+                key:            keyPrefix + '.removeDoorService',
+                type:           'checkbox',
+                title:          'Remove Door Service',
+                description:    'Enabling this will remove the door service from this accessory.'
             });
         }
 
